@@ -162,3 +162,5 @@ cython_debug/
 
 aws_config.json
 venv*/
+.vscode/
+.idea/
