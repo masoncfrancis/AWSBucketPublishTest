@@ -1,21 +1,36 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
-
-# snippet-start:[python.example_code.s3.Hello]
 import boto3
+from botocore.exceptions import NoCredentialsError
 
-def hello_s3():
+def create_s3_bucket(bucket_name, region='us-east-1'):
     """
-    Use the AWS SDK for Python (Boto3) to create an Amazon Simple Storage Service
-    (Amazon S3) resource and list the buckets in your account.
-    This example uses the default settings specified in your shared credentials
-    and config files.
-    """
-    s3_resource = boto3.resource('s3')
-    print("Hello, Amazon S3! Let's list your buckets:")
-    for bucket in s3_resource.buckets.all():
-        print(f"\t{bucket.name}")
+    Create a new S3 bucket in the specified AWS region.
 
-if __name__ == '__main__':
-    hello_s3()
-# snippet-end:[python.example_code.s3.Hello]
+    :param bucket_name: The desired name for the new bucket.
+    :param region: The AWS region where the bucket will be created. Default is 'us-east-1'.
+    """
+    # Create an S3 client
+    s3 = boto3.client('s3', region_name=region)
+
+    try:
+        # Create S3 bucket with location constraint
+        if region != 'us-east-1':
+            location = {'LocationConstraint': region}
+            s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
+        else:
+            s3.create_bucket(Bucket=bucket_name)
+
+        print(f"S3 bucket '{bucket_name}' created successfully in region '{region}'.")
+    except NoCredentialsError:
+        print("Credentials not available. Please configure your AWS credentials.")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
+if __name__ == "__main__":
+    # Specify your desired S3 bucket name
+    new_bucket_name = "0783914072839"
+
+    # Specify the AWS region where you want to create the bucket (optional, default is 'us-east-1')
+    aws_region = "us-west-1"
+
+    # Create the S3 bucket
+    create_s3_bucket(new_bucket_name, aws_region)
